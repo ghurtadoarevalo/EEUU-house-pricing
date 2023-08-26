@@ -13,7 +13,7 @@ Este proyecto es una herramienta para obtener y en un futuro visualizar informac
 - Recupera datos de propiedades de la API de Realtor.
 - Muestra información relevante en un formato estructurado (futuro).
 - Permite visualizar detalles como estado, ubicación, descripción, precio de lista y más (futuro).
-- Permite obtener información relevante acerca de de las propiedades según precios, ciudad, tamaño de la propiedad, etc.
+- Permite obtener información relevante acerca de de las propiedades según precios, ciudad, tamaño de la propiedad, etc. (futuro)
 
 
 ## Instalación
