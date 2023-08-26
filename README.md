@@ -2,9 +2,9 @@
 
 # Realtor API Property Viewer
 
-![GitHub License](https://img.shields.io/github/license/yghurtadoarevalo/realtor-api-property-viewer)
+![GitHub License](https://img.shields.io/github/license/yghurtadoarevalo/proyectoCH)
 ![Python Version](https://img.shields.io/badge/python-%3E%3D3.6-blue)
-![Last Commit](https://img.shields.io/github/last-commit/ghurtadoarevalo/realtor-api-property-viewer)
+![Last Commit](https://img.shields.io/github/last-commit/ghurtadoarevalo/proyectoCH)
 
 Este proyecto es una herramienta para obtener y en un futuro visualizar información detallada de propiedades inmobiliarias a través de la API de Realtor. De momento sólo hace la conexión a la API, pero en un futuro podría proporcionar una forma conveniente de acceder a los datos de diferentes propiedades y mostrarlos en un formato legible, pero más importante aún, obtener información relevante de los datos que serán almacenados en un datawarehouse. 
 
