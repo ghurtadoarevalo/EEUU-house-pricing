@@ -2,7 +2,7 @@
 
 # Realtor API Property Viewer
 
-![GitHub License](https://img.shields.io/github/license/yghurtadoarevalo/proyectoCH)
+![GitHub License](https://img.shields.io/github/license/ghurtadoarevalo/proyectoCH)
 ![Python Version](https://img.shields.io/badge/python-%3E%3D3.6-blue)
 ![Last Commit](https://img.shields.io/github/last-commit/ghurtadoarevalo/proyectoCH)
 
