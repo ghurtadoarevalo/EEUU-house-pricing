@@ -4,6 +4,8 @@ from dotenv import load_dotenv
 import os
 import matplotlib.pyplot as plt
 from propertiesDict import propertiesDictionary
+from dbAdapter import dbClass
+import pandas as pd
 
 # Función encargada de obtener un litado de propiedades por ciudad mediante la API de realtor.
 # param | (string) initDate: fecha inicial desde que se desea obtener el listado de propiedades | ex: "2022-09-25"
@@ -11,16 +13,17 @@ from propertiesDict import propertiesDictionary
 # param | (int) minPrice: precio mínimo que deben tener las propiedades | ex: 1000 
 # param | (int) maxPrice: precio máximo que deben tener las propiedades | ex: 200000
 # param | (string) city: ciudad de las propiedades | ex: "Nueva York"
+# param | (integer) limit: número máximo de propiedades que se traen por llamado a la API | ex: 10 | default: 5
 # returns | (array) Arreglo que contiene una serie de diccionarios con toda la información de las propiedades 
-def getPropertiesData(initDate, endDate, minPrice, maxPrice, city):
+def getPropertiesData(initDate, endDate, minPrice, maxPrice, city, limit = 5):
     url = "https://realtor.p.rapidapi.com/properties/v3/list"
     payload = {
-        "limit": 100,
+        "limit": limit,
         "offset": 0,
         "city": city,
         "sold_date": {
-            "max": initDate,
-            "min": endDate
+            "max": endDate,
+            "min": initDate
         },
         "sold_price": {
             "max": maxPrice,
@@ -62,36 +65,36 @@ def formatPropertiesData(propertiesData):
         formatedDict = {}
         for key in propertiesDictionary:
             if key == "location":
-                formatedDict[key] = {}
                 for subKey in propertiesDictionary[key]:
-                    formatedDict[key][subKey] = {}
                     for subSubKey in propertiesDictionary[key][subKey]:
-                        formatedDict[key][subKey][subSubKey] = {}
+                        formatedDict[subSubKey] = {}
                         if (propertiesDictionary[key][subKey][subSubKey]["target"] in propertyData[key][subKey]):
-                            formatedDict[key][subKey][subSubKey] = propertyData[key][subKey][subSubKey]
+                            formatedDict[subSubKey] = propertyData[key][subKey][subSubKey]
             elif key == "description":
-                formatedDict[key] = {}
                 for subKey in propertiesDictionary[key]:
-                    formatedDict[key][subKey] = {}
+                    formatedDict[subKey] = {}
                     if (propertiesDictionary[key][subKey]["target"] in propertyData[key]):
-                        formatedDict[key][subKey] = propertyData[key][subKey]
+                        formatedDict[subKey] = propertyData[key][subKey]
             else:
                 if (propertiesDictionary[key]["target"] in propertyData):
                     formatedDict[key] = propertyData[key]
         propertiesDataFormated.append(formatedDict)
     return propertiesDataFormated
 
-"""
-def plotPricesByCity(citiesName, citiesData):
-    for i, current_city in enumerate(citiesName):
-        plt.subplot(len(citiesName), 1, i+1)
-        current_city.history(period='365d')['Close'].plot(figsize=(
-            16, 60), title='Precio historico de 1 de un año para: ' + current_city)
-"""
-
 def main():
+    print('\nIniciando programa... \n')
+
     # Se utiliza librería para .env
     load_dotenv()
+
+    # Se crea el cliente de la BD
+    dbAdapterClass = dbClass()
+
+    print('Generando conexión a la BD \n')
+
+    # Se crea la tabla en la BD según el nombre de la tabla
+    dbAdapterClass.createPropertiesTable(tableName='properties_hist')
+    print('Creando tabla de la BD \n')
 
     # Listado de ciudades a consultar
     cities = ["Nueva York", "Los Angeles", "Chicago", "Houston", "Miami",
@@ -99,13 +102,29 @@ def main():
     
     citiesData = []
 
+    print('Comenzando la conexión a la API \n')
+
+    # Se recorre un listado de ciudades en los que se buscan propiedades dado un rango de fechas y precios
+    # Además se filtra y da formato a lo descargado desde la API.
     for city in cities:
         propertiesData = getPropertiesData(
-            '2022-09-25', '2021-09-25', 1000, 40000000, city)
+            '2021-09-25', '2022-09-25', 1000, 40000000, city, 10)
         propertiesDataFormated = formatPropertiesData(propertiesData)
         citiesData.append(propertiesDataFormated)
+    print('Terminando la conexión a la API y transformación de los datos\n')
 
+    # Se deja una lista de listas de diccionarios en una única lista que luego es pasada a un DF
+    flattened_list_of_dicts = [item for sublist in citiesData for item in sublist]
+    propertiesDf = pd.DataFrame(flattened_list_of_dicts)
+    print(propertiesDf)
+    
+    
+    #propertiesDf.to_sql('properties_hist', schema='ghurtadoarevalo_94_coderhouse' ,con=dbAdapterClass.getEngine(), index=False, if_exists='replace')    
+    print('\nCierre conexión a BD\n')
+    dbAdapterClass.endConnection()
 
+    print('Fin del programa\n')
+    exit(1)
 
 if __name__ == "__main__":
     main()
