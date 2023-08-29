@@ -1,6 +1,4 @@
-# proyectoCH
-
-# Realtor API Property Viewer
+# EEUU House pricing
 
 ![GitHub License](https://img.shields.io/github/license/ghurtadoarevalo/proyectoCH)
 ![Python Version](https://img.shields.io/badge/python-%3E%3D3.6-blue)
@@ -61,6 +59,8 @@ Este proyecto es una herramienta para obtener y en un futuro visualizar informac
    ```bash
    python main.py
    ```
+
+4. Los secretos utilizados para este código fueron entregados en los comentarios de la entrega dentro de la plataforma de Coder House
 
 ## Estructura del Código
 
