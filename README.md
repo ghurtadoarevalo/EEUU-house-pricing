@@ -57,16 +57,20 @@ Este proyecto es una herramienta para obtener y en un futuro visualizar informac
 3. Ejecuta el script principal para obtener información de propiedades:
 
    ```bash
-   python main.py
+   python app/main.py
    ```
 
 4. Los secretos utilizados para este código fueron entregados en los comentarios de la entrega dentro de la plataforma de Coder House
 
 ## Estructura del Código
 
-- `main.py`: El punto de entrada del programa. Genera la llamada a la API y procesa los datos obtenidos.
-- `propertiesDictionary.py`: Tiene el diccionario con el que se formatean los datos obtenidos mediante la API de Realtor. 
-- `dbAdapter.py`: Contiene la clase que permite generar la conexión a la BD redshift. 
+- `app/main.py`: El punto de entrada del programa.
+- `app/functions/properties.py`: Documento que contiene una serie de funciones para obtener las propiedades y darle formato al DF, así como otras para validar fechas en las que se han obtenido registros.
+- `app/service/realtorAPI.py`: Servicio que genera la conexión a la API de Realtor desde la cual se obtienen los registros de propiedades.
+- `app/dictionaries/propertiesDictionary.py`: Tiene el diccionario con el que se formatean los datos obtenidos mediante la API de Realtor. 
+- `app/db/psycoPgDbAdapter.py`: Contiene la clase que permite generar la conexión a la BD redshift con psycoPgDbAdapter. 
+- `app/db/sqlAlchemyDbAdapter.py`: Contiene la clase que permite generar la conexión a la BD redshift con sqlAlchemyDbAdapter [DEPRECATED]. 
+- `app/helpers/utils.py`: Contiene funciones que son de utilidad para diferentes partes del programa.
 - `.env`: Archivo de configuración para almacenar la clave y host de API de Realtor, así como las configuraciones de la BD.
 
 ## Contribuciones

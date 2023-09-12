@@ -46,7 +46,7 @@ propertiesDictionary = {
         "target": "list_price"
     },
     "last_sold_date": {
-        "valueType": "string",
+        "valueType": "date",
         "target": "last_sold_date"
     }
 }
