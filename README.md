@@ -81,11 +81,13 @@ Este proyecto es una herramienta para obtener y en un futuro visualizar informac
 - `airflow/dags/app/db/psycoPgDbAdapter.py`: Contiene la clase que permite generar la conexión a la BD redshift con psycoPgDbAdapter. 
 - `airflow/dags/app/db/sqlAlchemyDbAdapter.py`: Contiene la clase que permite generar la conexión a la BD redshift con sqlAlchemyDbAdapter [DEPRECATED]. 
 - `airflow/dags/app/helpers/utils.py`: Contiene funciones que son de utilidad para diferentes partes del programa.
-- `airflow/dags/app/logs`: Contiene los logs de airflow.
-- `airflow/dags/app/plugins`: Contiene los plugins que podrían agregarse a airflow.
-- `airflow/dags/app/raw_data`: Contiene los json con la data raw de las propiedades obtenidas.
-- `airflow/dags/app/processed_data`: Contiene los json con la data procesada de las propiedades obtenidas.
+- `airflow/dags/app/logs`: Carpeta que contiene los logs de airflow.
+- `airflow/dags/app/plugins`: Carpeta que contiene los plugins que podrían agregarse a airflow.
+- `airflow/dags/app/raw_data`: Carpeta que contiene los json con la data raw de las propiedades obtenidas.
+- `airflow/dags/app/processed_data`: Carpeta que contiene los json con la data procesada de las propiedades obtenidas.
 - `airflow/dags/.env`: Archivo de configuración para almacenar la clave y host de API de Realtor, así como las configuraciones de la BD.
+- `airflow/dags/dailyrealtorDag.py`: Archivo DAG que ejecuta una serie de tareas para el ETL.
+
 
 ## Contribuciones
 
