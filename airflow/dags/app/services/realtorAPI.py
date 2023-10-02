@@ -35,7 +35,6 @@ def APIData(initDate, endDate, minPrice, maxPrice, city, limit = 5):
             "X-RapidAPI-Key": os.getenv('RAPID_API_KEY'),
             "X-RapidAPI-Host": os.getenv('RAPID_API_HOST')
         }
-
         response = requests.post(url, json=payload, headers=headers)
         if(response.status_code == 200):
             responseDict = response.json()

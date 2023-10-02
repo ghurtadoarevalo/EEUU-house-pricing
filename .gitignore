@@ -160,3 +160,6 @@ cython_debug/
 #.idea/
 
 package-lock.json
+airflow/logs/*
+airflow/processed_data/*
+airflow/raw_data/*

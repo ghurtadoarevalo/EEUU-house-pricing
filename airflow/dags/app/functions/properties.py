@@ -14,47 +14,52 @@ import pandas as pd
 def getPropertiesData(cities, datesRange, pricesRange, maxPropertiesNumberByCity):
 
     citiesData = []
-
-    print('Comenzando la conexión a la API \n')
-
     # Se recorre un listado de ciudades en los que se buscan propiedades dado un rango de fechas y precios
     # Además se filtra y da formato a lo descargado desde la API.
     for city in cities:
+        print("Se comienza a obtener las propiedades de la ciudad:", city, "\n")
         propertiesData = APIData(
             datesRange[0], datesRange[1], pricesRange[0], pricesRange[1], city, maxPropertiesNumberByCity)
-        propertiesDataFormated = formatPropertiesData(propertiesData)
-        citiesData.append(propertiesDataFormated)
-    print('Terminando la conexión a la API y transformación de los datos\n')
+        print("Se obtuvieron", len(propertiesData), "propiedades de la ciudad:", city, "\n")
+        citiesData.append(propertiesData)
+    return citiesData
 
-    # Se deja una lista de listas de diccionarios en una única lista que luego es pasada a un DF
-    flattened_list_of_dicts = [item for sublist in citiesData for item in sublist]
-    propertiesDf = pd.DataFrame(flattened_list_of_dicts)
-    print(propertiesDf)
-
-    return propertiesDf
+def transformPropertiesData(citiesData):
+    citiesDataFormated = []
+    for cityData in citiesData:
+        propertyDataFormated = formatPropertiesData(cityData)
+        citiesDataFormated.append(propertyDataFormated)
+    # Se deja una lista de listas de diccionarios en una única lista 
+    flattened_list_of_dicts = [item for sublist in citiesDataFormated for item in sublist]
+    return flattened_list_of_dicts
 
 def propertiesDataToBD(tableName, propertiesData):
     # Se crea el cliente de la BD
     dbAdapterClass = sqlPsycoPgDbClass()
 
-    print('Generando conexión a la BD \n')
+    print('Generando conexión a la BD para cargar la data de las propiedades \n')
     # Se crea la tabla en la BD según el nombre de la tabla
+    print('Se crea la tabla de propiedades si no existe \n')
     dbAdapterClass.createPropertiesTable(tableName=tableName)
-    print('Creando tabla de la BD \n')
 
+    print('Se insertan los datos de propiedas en la BD \n')
     dbAdapterClass.insertToBd(tableName, propertiesData)    
-    print('\nCierre conexión a BD\n')
+    print('Cierre conexión a BD\n')
     dbAdapterClass.endConnection()
 
 
 def datesValidationDataToBD(tableName, datesRange):
     dbAdapterClass = sqlPsycoPgDbClass()
 
+    print('Generando conexión a la BD para cargar la data de las fechas de validación \n')
+
      # Se crea la tabla en la BD según el nombre de la tabla
+    print('Se crea la tabla de fechas de validación si no existe \n')
     dbAdapterClass.createDateValidationTable(tableName=tableName)
 
-    dateDf = pd.DataFrame([datesRange], columns=['init_date','end_date'])
+    dateDf = pd.DataFrame([datesRange], columns=['read_date'])
 
+    print('Se inserta la fecha en la tabla de validación en la BD \n')
     dbAdapterClass.insertToBd(tableName, dateDf)    
     
     print('\nCierre conexión a BD\n')
@@ -67,4 +72,4 @@ def validatePropertiesDate(tableName, datesRange):
     if tableExist:
         return dbAdapterClass.dateValidation(tableName, datesRange)
     else:
-        return {"initDate": False, "endDate": False}
+        return 0

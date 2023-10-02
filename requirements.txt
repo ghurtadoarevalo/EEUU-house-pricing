@@ -1,7 +1,7 @@
-requests==2.31.0
-python-dotenv==1.0.0
-matplotlib==3.7.2
-SQLAlchemy===2.0.20
-psycopg2===2.9.7
-sqlalchemy-redshift===0.8.14
-redshift-connector===2.0.913
+requests
+python-dotenv
+psycopg2-binary
+sqlalchemy-redshift
+redshift-connector
+pandas
+pytz

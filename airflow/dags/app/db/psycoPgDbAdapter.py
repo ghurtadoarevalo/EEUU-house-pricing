@@ -52,21 +52,9 @@ class dbClass:
             if not self.verifyTableExist(tableName):
                 self.cur.execute(createTableQuery)
                 self.conn.commit()
-                print(f'The table with the name {tableName} has been created successfully\n')
+                print(f'La tabla de nombre {tableName} ha sido creada de forma exitosa\n')
             else:
-                print(f'The table with the name {tableName} already exists\n')
-        except Exception as e:
-            print(f"Error creating table: {e}")
-            exit(1)
-
-    def createDatesTable(self, tableName, createTableQuery):
-        try:
-            if not self.verifyTableExist(tableName):
-                self.cur.execute(createTableQuery)
-                self.conn.commit()
-                print(f'The table with the name {tableName} has been created successfully\n')
-            else:
-                print(f'The table with the name {tableName} already exists\n')
+                print(f'La tabla de nombre {tableName} ya existe\n')
         except Exception as e:
             print(f"Error creating table: {e}")
             exit(1)
@@ -96,7 +84,6 @@ class dbClass:
             self.conn.rollback()
             cursor.close()
             return 1
-        print("execute_values() done")
         cursor.close()
 
     def createPropertiesTable(self, tableName):
@@ -124,8 +111,7 @@ class dbClass:
         createTableQuery = f"""
         CREATE TABLE IF NOT EXISTS {self.schema}.{tableName} (
             date_id INT IDENTITY(0,1),
-            init_date DATE,
-            end_date DATE,
+            read_date DATE,
             created_on TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             updated_on TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             PRIMARY KEY (date_id)
@@ -133,33 +119,20 @@ class dbClass:
         """
         self.createTable(tableName, createTableQuery)
 
-    def dateValidation(self, tableName, datesRange):
-
-        initDateStr = datesRange[0]
-        endDateStr = datesRange[1]
-
+    def dateValidation(self, tableName, validationDate):
         selectQuery = f"""
-            	SELECT init_date , end_date, initDaysDiff, null as endDaysDiff FROM
-                (SELECT top 1 init_date, end_date, datediff(days, '{initDateStr}', init_date) as initDaysDiff
-                FROM {self.schema}.{tableName} where initDaysDiff > 0 ORDER BY initDaysDiff asc) 
-                UNION
-                SELECT init_date , end_date, null as initDaysDiff, endDaysDiff  FROM
-                (SELECT top 1 init_date, end_date, datediff(days, end_date, '{endDateStr}') as endDaysDiff
-                FROM {self.schema}.{tableName} where endDaysDiff > 0 ORDER BY endDaysDiff asc );
+                SELECT
+                    CASE 
+                    WHEN count(read_date) >= 1 THEN 1
+                    WHEN count(read_date) = 0 THEN 0
+                END existense
+                FROM {self.schema}.{tableName} WHERE '{validationDate}' = read_date 
+
         """
 
-        # Con esta Query se obtienen 2 registros, 1 para el filtro del init date y otro para el de end date
-        # La lógica es que se busca en la tabla properties_dates_validation aquellos registros
-        # Que tenga una menor diferencia de días con initDate y endDate entregado por el usuario
-        # De esta manera, luego se filtran aquellas fechas fuera de la validación
         queryResult = self.executeReadQuery(selectQuery)
 
-        validationDatesRange = {"initDate": None, "endDate": None}
-        for dates in queryResult:
-            if dates[3] == None:
-                initDateStr = dates[0].strftime('%Y-%m-%d')
-                validationDatesRange["initDate"] = initDateStr
-            elif dates[2] == None:
-                endDateStr = dates[1].strftime('%Y-%m-%d')
-                validationDatesRange["endDate"] = endDateStr
-        return validationDatesRange
+        if queryResult[0][0] == 1:
+            return True
+        else: 
+            return False
