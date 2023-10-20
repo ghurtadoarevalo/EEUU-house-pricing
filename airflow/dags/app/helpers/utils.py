@@ -34,11 +34,3 @@ def dfToTuples(dataFrame):
     tuples = [tuple(x) for x in dataFrameClean.values]
     return tuples
 
-""" Esto se le puede aplicar más adelante a formatPropertiesData para que se respeten ciertas reglas del diccionario     
-
-def applyRules(rules, data):
-    if (data == None or data == ''):
-        return None
-    else:
-        return data
-"""

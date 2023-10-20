@@ -163,3 +163,4 @@ package-lock.json
 airflow/logs/*
 airflow/processed_data/*
 airflow/raw_data/*
+airflow/error_data/*
