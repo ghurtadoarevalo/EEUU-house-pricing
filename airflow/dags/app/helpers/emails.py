@@ -19,7 +19,6 @@ def sendAlertEmail(exec_date, dag_path):
 
 def sendEmail(emailHtml, subject):
     try:
-        
         message = EmailMessage()
         message["From"] = os.getenv("EMAIL_USER")
         message["To"] = os.getenv("EMAIL_USER")

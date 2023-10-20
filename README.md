@@ -6,13 +6,14 @@
 
 La base de este proyecto nace al ver que en EE.UU los precios de las casas y departamentos al año 2023 se han disparado. Altas tasas de interés y una economía convulsionada dan pie a precios poco accesibles para los norte americanos. Considerando lo anterior, este proyecto busca identificar si estas alzas son significativas en todo el país, si se ven reflejados en los arriendos, cuánto ha sido el aumento en base a los años, entre otros índices que podrían ser interesantes de analizar.
 
-Este proyecto es una herramienta para obtener y en un futuro visualizar información detallada de propiedades inmobiliarias a través de la API de Realtor. De momento sólo hace la conexión a la API, pero en un futuro podría proporcionar una forma conveniente de acceder a los datos de diferentes propiedades y mostrarlos en un formato legible, pero más importante aún, obtener información relevante de los datos que serán almacenados en un datawarehouse. 
+Este proyecto es una herramienta para obtener y en un futuro visualizar información detallada de propiedades inmobiliarias a través de la API de Realtor, haciendo uso de Apache Airflow para su orquestación mediante diferentes tareas. De momento realiza todo el proceso de ETL, con la extracción desde la API, transformación de los datos seleccionando los más relevantes, y la carga en una base de datos AWS Redshift. Esto proporciona una forma conveniente de acceder a los datos de diferentes propiedades y mostrarlos en un formato legible, pero más importante aún, obtener información relevante de los datos que serán almacenados en un datawarehouse. 
 
 ## Características
 
 - Recupera datos de propiedades de la API de Realtor.
 - Se filtran y transforman sólo los datos que son relevantes.
 - Se persisten los datos sólo si no se ha consultado anteriormente durante el día.
+- Se envían correos de notificación en caso de propiedades con datos fuera de ciertos rangos o cuando existan errores en la ejecución de las tareas de Airflow.
 
 ## Requisitos
 
@@ -45,13 +46,17 @@ Este proyecto es una herramienta para obtener y en un futuro visualizar informac
     RAPID_API_HOST = INSERTAR HOST 
     ```
 
-3. Ingresar credenciales de la BD en el archivo .env con los siguientes secretos:
+3. Ingresar credenciales de la BD y del email en el archivo .env con los siguientes secretos:
 
    ```plaintext
    DB_USERNAME= NOMBRE DE USUARIO
    DB_PASSWORD= PASSWORD DE LA BD
    DB_CONNECTION= URL DE CONEXIÓN A LA BD
    DB_NAME= NOMBRE DE LA BD
+
+   EMAIL_USER= gmail@gmail.com
+   EMAIL_PASSWORD= APP PASSWORD gmail
+   SMTP_HOST= 'smtp.gmail.com'
    ```
 
 4. Se ejecuta el docker-compose que levantará las imágenes necesarias para airflow e instalará las dependencias del programa desde requirements.txt
@@ -70,23 +75,41 @@ Este proyecto es una herramienta para obtener y en un futuro visualizar informac
 
 9. Los secretos utilizados para este código fueron entregados en los comentarios de la entrega dentro de la plataforma de Coder House
 
-## Estructura del Código
+## Estructura del proyecto
+
+##### Docker
 
 - `docker-compose.yml`: Archivo de docker compose que levantará los contenedores de Docker para Airflow y las dependencias del DAG.
 - `Dockerfile`: Archivo Dockerfile utilizado en docker-compose que permite traer la imagen de airflow e instalar las dependencias del DAG que se encuentra en requirements.txt
 - `requirements.txt`: Dependencias necesarias para el correcto funcionamiento del DAG.
+
+##### Código
+
 - `airflow/dags/app/functions/properties.py`: Documento que contiene una serie de funciones para obtener las propiedades y darle formato al DF, así como otras para validar fechas en las que se han obtenido registros.
+- `airflow/dags/app/functions/tresholdValidator.py`: Documento que contiene una serie de funciones para validar los datos de las propiedades.
 - `airflow/dags/app/service/realtorAPI.py`: Servicio que genera la conexión a la API de Realtor desde la cual se obtienen los registros de propiedades.
 - `airflow/dags/app/dictionaries/propertiesDictionary.py`: Tiene el diccionario con el que se formatean los datos obtenidos mediante la API de Realtor. 
 - `airflow/dags/app/db/psycoPgDbAdapter.py`: Contiene la clase que permite generar la conexión a la BD redshift con psycoPgDbAdapter. 
 - `airflow/dags/app/db/sqlAlchemyDbAdapter.py`: Contiene la clase que permite generar la conexión a la BD redshift con sqlAlchemyDbAdapter [DEPRECATED]. 
 - `airflow/dags/app/helpers/utils.py`: Contiene funciones que son de utilidad para diferentes partes del programa.
+- `airflow/dags/app/helpers/email.py`: Contiene la función para enviar emails, así como los htmls para errores y alertas.
+
+#### Airflow
+
 - `airflow/dags/app/logs`: Carpeta que contiene los logs de airflow.
 - `airflow/dags/app/plugins`: Carpeta que contiene los plugins que podrían agregarse a airflow.
+- `airflow/airflow.cfg`: Archivo de configuración de airflow.
+- `airflow/dags/dailyrealtorDag.py`: Archivo DAG que ejecuta una serie de tareas para el ETL.
+#### Data
+
 - `airflow/dags/app/raw_data`: Carpeta que contiene los json con la data raw de las propiedades obtenidas.
 - `airflow/dags/app/processed_data`: Carpeta que contiene los json con la data procesada de las propiedades obtenidas.
-- `airflow/dags/.env`: Archivo de configuración para almacenar la clave y host de API de Realtor, así como las configuraciones de la BD.
-- `airflow/dags/dailyrealtorDag.py`: Archivo DAG que ejecuta una serie de tareas para el ETL.
+- `airflow/dags/app/error_data`: Carpeta que contiene los json con la data que no cumple con los límites establecidos.
+
+#### Configs
+
+- `airflow/dags/config/alerts.py`: Archivo que contiene los límites para los valores de las propiedades, ciudades y tipo de propiedad (threshold).
+- `airflow/dags/.env`: Archivo de configuración para almacenar la clave y host de API de Realtor, así como las configuraciones de la BD y el email.
 
 
 ## Contribuciones
